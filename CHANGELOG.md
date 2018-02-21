@@ -1,3 +1,92 @@
+# Sensu cookbook changelog
+
+This file is used to track changes made in each version of the sensu cookbook.
+
+## 2.12.0 - 2016-03-14
+
+### Project changes
+
+The Sensu cookbook project has adopted a new contribution workflow and a new code of conduct policy. Please see the relevant documents in repo for details.
+
+### Behavior changes
+
+* Values for `owner` and `group` properties on `sensu_json_file` resources now default to lazy evaluation of node attributes `sensu.admin_user` and `sensu.group` respectively. (#426)
+
+* Data bags remain default source of SSL certificates, but are now optional:
+
+	With the addition of Sensu state helpers in #410 recipes which access credentials via data bags (i.e. `default`, `rabbitmq` and `enterprise` recipes) have been updated to make these data bag items optional.
+
+	Please see the readme and integration test suite for examples of using these helpers.
+
+* Testing notes have been added in `TESTING.md` to describe some of the platform/suite combinations which are disabled or otherwise require special configuration.
+
+### Features
+
+Added [ChefSpec](https://github.com/sethvargo/chefspec) test coverage for the following:
+
+* `default` and `client_service` recipes
+* `sensu_gem` LWRP
+* Sensu::Helpers library `#select_attributes` and `#gem_binary`  methods
+
+Added source attribute to sensu_gem resource
+Added upgrade action to sensu_gem resource
+Added helpers for storing key/value pairs which persist for duration of the Chef run
+
+### Fixes
+
+Allow "standard" as a value of type attribute on `sensu_check` resources, [as described in Sensu documentation](https://sensuapp.org/docs/0.21/checks).
+
+## 2.11.0 - 2015-11-11
+
+### Features
+
+Added ability to disable repo installation similar to the Uchiwa cookbook
+
+Added enterprise dashboard recipe and attributes
+
+Added sensitive to some file creation resources for security
+
+### Fixes
+
+Set default log level of Enterprise to info
+
+Updated repository URLs for Sensu
+
+Fixed dependency and extension for chef-vault
+
+Reverted previous change to enterprise service notifications back to immediate
+restart to resolve issue #373
+
+Updated node attribute access from dot notation to quoted strings for better
+compatibility
+
+### Other
+
+Bumped the default version of Sensu to 0.20.3-1
+
+Bumped the default version of Enterprise to 1.5.2-1
+
+The Berksfile is now ignored to allow ChefDK users to use their own Berksfile
+
+Removed Enterprise data bag item
+
+Added ChefSpec matcher for `create_sensu_dashboard_config`
+
+## 2.10.0 - 2015-05-25
+
+### Fixes
+
+Changed restart notifications with enterprise for client, api, and server
+configurations to delayed instead of immediate.
+
+### Other
+
+Bumped the default version of Sensu to 0.18.1-1
+
+Bumped the default version of Enterprise to 1.1.0-1
+
+Added winrm-transport gem for Test Kitchen in the Gemfile
+
 ## 2.9.1 - 2015-04-07
 
 ### Fixes

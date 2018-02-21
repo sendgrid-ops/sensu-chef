@@ -19,16 +19,22 @@
 
 include_recipe "sensu"
 
-platform_family = node.platform_family
-platform_version = node.platform_version.to_i
+platform_family = node["platform_family"]
+platform_version = node["platform_version"].to_i
 
-data_bag_name = node.sensu.data_bag.name
-enterprise_item = node.sensu.data_bag.enterprise_item
+data_bag_name = node["sensu"]["data_bag"]["name"]
+enterprise_item = node["sensu"]["data_bag"]["enterprise_item"]
 
-enterprise = Sensu::Helpers.data_bag_item(enterprise_item, true, data_bag_name)
+begin
+  unless get_sensu_state(node, "enterprise")
+    enterprise = Sensu::Helpers.data_bag_item(enterprise_item, true, data_bag_name)
+    set_sensu_state(node, "enterprise", enterprise)
+   end
+rescue => e
+    Chef::Log.warn("Failed to populate Sensu state with Enterprise repository credentials from data bag: " + e.inspect)
+end
 
-credentials = enterprise["repository"]["credentials"]
-
+credentials = get_sensu_state(node, "enterprise", "repository", "credentials")
 repository_url = "http://#{credentials['user']}:#{credentials['password']}@enterprise.sensuapp.com"
 
 case platform_family
@@ -39,13 +45,13 @@ when "debian"
     uri File.join(repository_url, "apt")
     key File.join(repository_url, "apt", "pubkey.gpg")
     distribution "sensu-enterprise"
-    components node.sensu.enterprise.use_unstable_repo ? ["unstable"] : ["main"]
+    components node["sensu"]["enterprise"]["use_unstable_repo"] ? ["unstable"] : ["main"]
     action :add
   end
 else
   repo = yum_repository "sensu-enterprise" do
     description "sensu enterprise"
-    repo = node.sensu.enterprise.use_unstable_repo ? "yum-unstable" : "yum"
+    repo = node["sensu"]["enterprise"]["use_unstable_repo"] ? "yum-unstable" : "yum"
     url "#{repository_url}/#{repo}/noarch/"
     action :add
   end
@@ -53,7 +59,7 @@ else
 end
 
 package "sensu-enterprise" do
-  version node.sensu.enterprise.version
+  version node["sensu"]["enterprise"]["version"]
 end
 
 template "/etc/default/sensu-enterprise" do

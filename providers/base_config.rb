@@ -1,11 +1,11 @@
 action :create do
   definitions = Sensu::Helpers.select_attributes(
-    node.sensu,
+    node["sensu"],
     %w[transport rabbitmq redis api]
   )
 
-  data_bag_name = node.sensu.data_bag.name
-  config_item = node.sensu.data_bag.config_item
+  data_bag_name = node["sensu"]["data_bag"]["name"]
+  config_item = node["sensu"]["data_bag"]["config_item"]
 
   config = Sensu::Helpers.data_bag_item(config_item, true, data_bag_name)
 
@@ -20,7 +20,10 @@ action :create do
     api
     server
   ].each do |service|
-    next unless node.recipe?("sensu::#{service}_service")
+    unless node.recipe?("sensu::#{service}_service") ||
+        node.recipe?("sensu::enterprise_service")
+      next
+    end
 
     service_data_bag_item = Sensu::Helpers.data_bag_item(service, true, data_bag_name)
 
@@ -33,7 +36,7 @@ action :create do
     definitions = Chef::Mixin::DeepMerge.merge(definitions, service_config)
   end
 
-  f = sensu_json_file ::File.join(node.sensu.directory, "config.json") do
+  f = sensu_json_file ::File.join(node["sensu"]["directory"], "config.json") do
     content Sensu::Helpers.sanitize(definitions)
   end
 

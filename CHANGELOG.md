@@ -2,6 +2,10 @@
 
 This file is used to track changes made in each version of the sensu cookbook.
 
+## 2.12.1 - 2018-02-21
+
+Supports Amazon
+
 ## 2.12.0 - 2016-03-14
 
 ### Project changes

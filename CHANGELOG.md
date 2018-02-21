@@ -87,6 +87,12 @@ Bumped the default version of Enterprise to 1.1.0-1
 
 Added winrm-transport gem for Test Kitchen in the Gemfile
 
+## 2.9.1 - 2015-04-07
+
+### Fixes
+
+Updated linux yum repo to include $releasever
+
 ## 2.9.0 - 2015-04-02
 
 ### Features

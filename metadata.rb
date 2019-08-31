@@ -35,3 +35,5 @@ suggests "chef-vault", ">= 1.3.1"
 ].each do |os|
   supports os
 end
+
+chef_version '>= 12.6'
